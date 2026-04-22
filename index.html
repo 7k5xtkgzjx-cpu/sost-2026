@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retreat Program Price Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header .logo {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 18px;
+            display: block;
+            background: white;
+            padding: 6px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+            margin-top: 8px;
+        }
+
+        .content {
+            padding: 35px;
+        }
+
+        .calculator-section {
+            margin-bottom: 30px;
+        }
+
+        .hotel-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .hotel-card {
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .hotel-card:hover {
+            border-color: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
+        }
+
+        .hotel-card.selected {
+            border-color: #0d47a1;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+
+        .hotel-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0d47a1;
+            margin-bottom: 10px;
+        }
+
+        .meal-plan {
+            font-size: 13px;
+            color: #555;
+            background: #fff3cd;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            background: white;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #1976d2;
+        }
+
+        .nights-input {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 71, 161, 0.4);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8eaf6 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            color: #0d47a1;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-breakdown {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #555;
+            font-size: 15px;
+        }
+
+        .result-value {
+            color: #0d47a1;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .total-price {
+            background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .total-label {
+            font-size: 16px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .total-amount {
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .note strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .hotel-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .nights-input {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="assets/logo.jpeg" alt="SOST logo" class="logo">
+            <h1>🕌 Official Retreat Program Calculator</h1>
+            <p>Calculate your accommodation costs with ease</p>
+        </div>
+
+        <div class="content">
+            <div class="note">
+                <strong>⚠️ Important Note:</strong>
+                Children aged 4 to 12 are priced as adults for all services.
+            </div>
+            <div class="calculator-section">
+                <div class="hotel-selector">
+                    <div class="hotel-card" id="baykara" onclick="selectHotel('baykara')">
+                        <div class="hotel-name">Baykara Hotel</div>
+                        <div class="meal-plan">🍳 Breakfast Only</div>
+                    </div>
+                    <div class="hotel-card" id="ramada" onclick="selectHotel('ramada')">
+                        <div class="hotel-name">Ramada Encore Hotel</div>
+                        <div class="meal-plan">🍳 Breakfast + 🍽️ Dinner</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomType">Room Type</label>
+                    <select id="roomType">
+                        <option value="">Select room type</option>
+                        <option value="single">Single Room</option>
+                        <option value="double">Double / Twin Room</option>
+                        <option value="triple">Triple Room</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Number of Nights</label>
+                    <div class="nights-input">
+                        <div>
+                            <label for="baseNights" style="font-size: 13px; color: #666; margin-bottom: 6px;">Base Nights (fixed)</label>
+                            <input type="number" id="baseNights" value="5" readonly style="background: #f5f5f5; cursor: not-allowed;">
+                        </div>
+                        <div>
+                            <label for="extraNights" style="font-size: 13px; color: #666; margin-bottom: 6px;">Extra Nights</label>
+                            <input type="number" id="extraNights" min="0" value="0" placeholder="Extra nights">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="persons">Number of Persons</label>
+                    <input type="number" id="persons" min="1" value="1" placeholder="Enter number of persons">
+                </div>
+
+                <button class="calculate-btn" onclick="calculatePrice()">Calculate Total Price</button>
+            </div>
+
+            <div class="result-section" id="resultSection">
+                <div class="result-header">📊 Price Breakdown</div>
+                <div class="result-breakdown" id="breakdown"></div>
+                <div class="total-price">
+                    <div class="total-label">Total Amount</div>
+                    <div class="total-amount" id="totalAmount">$0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pricing = {
+            baykara: {
+                single: { base: 800, extra: 95 },
+                double: { base: 640, extra: 65 },
+                triple: { base: 595, extra: 60 }
+            },
+            ramada: {
+                single: { base: 1035, extra: 120 },
+                double: { base: 790, extra: 75 },
+                triple: { base: 705, extra: 65 }
+            }
+        };
+
+        let selectedHotel = null;
+
+        function selectHotel(hotel) {
+            selectedHotel = hotel;
+            document.querySelectorAll('.hotel-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById(hotel).classList.add('selected');
+        }
+
+        function calculatePrice() {
+            if (!selectedHotel) {
+                alert('Please select a hotel');
+                return;
+            }
+
+            const roomType = document.getElementById('roomType').value;
+            if (!roomType) {
+                alert('Please select a room type');
+                return;
+            }
+
+            const nights = parseInt(document.getElementById('baseNights').value);
+            const extraNights = parseInt(document.getElementById('extraNights').value) || 0;
+            const persons = parseInt(document.getElementById('persons').value);
+
+            if (!nights || nights < 1) {
+                alert('Please enter a valid number of nights');
+                return;
+            }
+
+            if (extraNights < 0) {
+                alert('Extra nights cannot be negative');
+                return;
+            }
+
+            if (!persons || persons < 1) {
+                alert('Please enter a valid number of persons');
+                return;
+            }
+
+            const hotelPricing = pricing[selectedHotel][roomType];
+            const totalNights = nights + extraNights;
+            const baseTotal = hotelPricing.base * persons;
+            const extraTotal = hotelPricing.extra * extraNights * persons;
+            const totalPrice = baseTotal + extraTotal;
+
+            let breakdown = `
+                <div class="result-row">
+                    <span class="result-label">Hotel</span>
+                    <span class="result-value">${selectedHotel === 'baykara' ? 'Baykara Hotel' : 'Ramada Encore Hotel'}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Room Type</span>
+                    <span class="result-value">${roomType.charAt(0).toUpperCase() + roomType.slice(1)}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Total Nights</span>
+                    <span class="result-value">${totalNights} (${nights} base${extraNights > 0 ? ` + ${extraNights} extra` : ''})</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Persons</span>
+                    <span class="result-value">${persons}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Base Price (${nights} nights)</span>
+                    <span class="result-value">$${hotelPricing.base} × ${persons} = $${baseTotal}</span>
+                </div>
+            `;
+
+            if (extraNights > 0) {
+                breakdown += `
+                    <div class="result-row">
+                        <span class="result-label">Extra Nights</span>
+                        <span class="result-value">$${hotelPricing.extra} × ${extraNights} nights × ${persons} = $${extraTotal}</span>
+                    </div>
+                `;
+            }
+
+            document.getElementById('breakdown').innerHTML = breakdown;
+            document.getElementById('totalAmount').textContent = '$' + totalPrice.toLocaleString();
+            document.getElementById('resultSection').classList.add('show');
+            
+            // Scroll to results
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>
